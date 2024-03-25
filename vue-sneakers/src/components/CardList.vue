@@ -9,7 +9,7 @@ const onClickAdd = () => {
 <template>
   <div class="grid grid-cols-4 gap-5">
     <Card
-      imageUrl="/public/sneakers/sneakers-1.jpg"
+      imageUrl="/sneakers/sneakers-1.jpg"
       title="Мужские Кроссовки Nike Blazer Mid Suede"
       :price="5000"
       isFavorite="true"
