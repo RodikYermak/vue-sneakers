@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch, reactive } from 'vue'
+import { onMounted, ref, watch, reactive, provide } from 'vue'
 import axios from 'axios'
 
 import Header from './components/Header.vue'
@@ -21,6 +21,54 @@ const onChangeSearch = (event) => {
   filters.searchQuery = event.target.value
 }
 
+const fetchFavorites = async () => {
+  try {
+    const { data: favorites } = await axios.get('https://d348e7c385bb7fd6.mokky.dev/favorites')
+
+    items.value = items.value.map((item) => {
+      const favorite = favorites.find((favorite) => favorite.parentId === item.id)
+
+      if (!favorite) {
+        return item
+      }
+
+      return {
+        ...item,
+        isFavorite: true,
+        favoriteId: favorite.id
+      }
+    })
+
+    console.log(items)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const addToFavorite = async (item) => {
+  try {
+    item.isFavorite = !item.isFavorite
+    if (!item.isFavorite) {
+      const obj = {
+        parentId: item.id
+      }
+
+      const { data } = await axios.post('https://d348e7c385bb7fd6.mokky.dev/favorites', obj)
+
+      console.log(data)
+
+      item.isFavorite = true
+      item.favoriteId = data.id
+    } else {
+      await axios.delete(`https://d348e7c385bb7fd6.mokky.dev/favorites/${item.favoriteId}`)
+
+      item.favoriteId = null
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const fetchItems = async () => {
   try {
     const params = {
@@ -33,14 +81,24 @@ const fetchItems = async () => {
 
     const { data } = await axios.get('https://d348e7c385bb7fd6.mokky.dev/items', { params })
 
-    items.value = data
+    items.value = data.map((obj) => ({
+      ...obj,
+      isFavorite: false,
+      favoriteId: null,
+      isAdded: false
+    }))
   } catch (error) {
     console.log(error)
   }
 }
 
-onMounted(fetchItems)
+onMounted(async () => {
+  await fetchItems()
+  await fetchFavorites()
+})
 watch(filters, fetchItems)
+
+provide('addToFavorite', addToFavorite)
 </script>
 
 <template>
@@ -71,7 +129,7 @@ watch(filters, fetchItems)
         </div>
       </div>
       <div class="mt-10">
-        <CardList :items="items" />
+        <CardList :items="items" @addToFavorite="addToFavorite" />
       </div>
     </div>
   </div>
@@ -79,4 +137,4 @@ watch(filters, fetchItems)
 
 <style scoped></style>
 
-<!-- 3:50:12 -->
+<!-- 4:49:47 -->
