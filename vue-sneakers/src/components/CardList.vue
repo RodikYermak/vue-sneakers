@@ -1,6 +1,10 @@
 <script setup>
 import Card from './Card.vue'
 
+defineProps({
+  items: Array
+})
+
 const onClickAdd = () => {
   alert('Add')
 }
@@ -9,10 +13,12 @@ const onClickAdd = () => {
 <template>
   <div class="grid grid-cols-4 gap-5">
     <Card
-      imageUrl="/sneakers/sneakers-1.jpg"
-      title="Мужские Кроссовки Nike Blazer Mid Suede"
-      :price="5000"
-      isFavorite="true"
+      v-for="item in items"
+      v-bind:key="item.id"
+      :imageUrl="item.imageUrl"
+      :title="item.title"
+      :price="item.price"
+      :isFavorite="false"
       :onClickAdd="onClickAdd"
     />
   </div>
