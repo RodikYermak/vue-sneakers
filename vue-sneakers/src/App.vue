@@ -39,7 +39,6 @@ const fetchFavorites = async () => {
       }
     })
 
-    console.log(items)
   } catch (error) {
     console.log(error)
   }
