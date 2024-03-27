@@ -47,19 +47,18 @@ const fetchFavorites = async () => {
 
 const addToFavorite = async (item) => {
   try {
-    item.isFavorite = !item.isFavorite
     if (!item.isFavorite) {
       const obj = {
         parentId: item.id
       }
 
+      item.isFavorite = true
+
       const { data } = await axios.post('https://d348e7c385bb7fd6.mokky.dev/favorites', obj)
 
-      console.log(data)
-
-      item.isFavorite = true
       item.favoriteId = data.id
     } else {
+      item.isFavorite = false
       await axios.delete(`https://d348e7c385bb7fd6.mokky.dev/favorites/${item.favoriteId}`)
 
       item.favoriteId = null
