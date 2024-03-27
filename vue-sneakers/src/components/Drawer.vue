@@ -1,5 +1,12 @@
 <script setup>
 import CartItem from './CartItem.vue'
+import { inject } from 'vue'
+
+const { closeDrawer, cart, removeFromCart, totalPrice, createOrder } = inject('cart')
+
+defineProps({
+  vatPrice: Number
+})
 </script>
 
 <template>
@@ -15,6 +22,7 @@ import CartItem from './CartItem.vue'
           viewBox="0 0 16 14"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          @click="closeDrawer"
         >
           <path
             d="M1 7H14.7143"
@@ -36,24 +44,12 @@ import CartItem from './CartItem.vue'
       <div class="flex flex-col flex-1 gap-4 justify-between">
         <div class="flex flex-col gap-5">
           <CartItem
-            title="Мужские Кроссовки Nike Blazer Mid Suede"
-            price="1000"
-            img="/sneakers/sneakers-1.jpg"
-          />
-          <CartItem
-            title="Мужские Кроссовки Nike Blazer Mid Suede"
-            price="1000"
-            img="/sneakers/sneakers-1.jpg"
-          />
-          <CartItem
-            title="Мужские Кроссовки Nike Blazer Mid Suede"
-            price="1000"
-            img="/sneakers/sneakers-1.jpg"
-          />
-          <CartItem
-            title="Мужские Кроссовки Nike Blazer Mid Suede"
-            price="1000"
-            img="/sneakers/sneakers-1.jpg"
+            v-for="item in cart"
+            :key="item.id"
+            :img="item.imageUrl"
+            :title="item.title"
+            :price="item.price"
+            :onClickRemove="() => removeFromCart(item)"
           />
         </div>
 
@@ -62,17 +58,18 @@ import CartItem from './CartItem.vue'
             <div class="flex items-end gap-2">
               <span>Итого:</span>
               <div class="flex-1 border-b border-dashed" />
-              <span class="font-bold">1000 руб.</span>
+              <span class="font-bold">{{ totalPrice }} руб.</span>
             </div>
 
             <div class="flex items-end gap-2">
               <span>Налог 5%:</span>
               <div class="flex-1 border-b border-dashed" />
-              <span class="font-bold">50 руб.</span>
+              <span class="font-bold">{{ vatPrice }} руб.</span>
             </div>
           </div>
 
           <button
+            @click="createOrder"
             class="flex justify-center items-center gap-3 w-full py-3 mt-10 bg-lime-500 text-white rounded-xl transition active:bg-lime-700 hover:bg-lime-600"
           >
             Оформить заказ
