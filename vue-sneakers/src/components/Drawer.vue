@@ -52,7 +52,7 @@ defineProps({
       </div>
 
       <div class="flex flex-col flex-1 gap-4 justify-between">
-        <div v-if="cart.length" class="flex flex-col gap-5">
+        <div v-if="cart.length" class="flex flex-col gap-5" v-auto-animate>
           <CartItem
             v-for="item in cart"
             :key="item.id"
@@ -67,13 +67,13 @@ defineProps({
           <div class="flex flex-col gap-5">
             <div class="flex items-end gap-2">
               <span>Итого:</span>
-              <div class="flex-1 border-b border-dashed" />
+              <div class="flex-1 border-b border-dashed"></div>
               <span class="font-bold">{{ totalPrice }} руб.</span>
             </div>
 
             <div class="flex items-end gap-2">
               <span>Налог 5%:</span>
-              <div class="flex-1 border-b border-dashed" />
+              <div class="flex-1 border-b border-dashed"></div>
               <span class="font-bold">{{ vatPrice }} руб.</span>
             </div>
           </div>
