@@ -17,6 +17,7 @@ defineProps({
   >
     <div @click="onClick" class="absolute top-8 left-8">
       <img
+        v-if="onClickFavorite"
         @click="onClickFavorite"
         :src="!isFavorite ? '/like-1.svg' : '/like-2.svg'"
         alt="Favorite"
@@ -31,7 +32,12 @@ defineProps({
         <span class="text-slate-200">Цена:</span>
         <span class="font-bold">{{ price }} руб.</span>
       </div>
-      <img @click="onClickAdd" :src="!isAdded ? '/plus.svg' : 'checked.svg'" alt="Plus" />
+      <img
+        v-if="onClickFavorite"
+        @click="onClickAdd"
+        :src="!isAdded ? '/plus.svg' : 'checked.svg'"
+        alt="Plus"
+      />
     </div>
   </div>
 </template>
