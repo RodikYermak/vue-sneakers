@@ -3,7 +3,7 @@ import CartItem from './CartItem.vue'
 import InfoBlock from './InfoBlock.vue'
 import { inject } from 'vue'
 
-const { closeDrawer, cart, removeFromCart, totalPrice, createOrder } = inject('cart')
+const { closeDrawer, cart, removeFromCart, totalPrice, createOrder, orderId } = inject('cart')
 
 defineProps({
   vatPrice: Number
@@ -43,11 +43,19 @@ defineProps({
         Корзина
       </h2>
 
-      <div v-if="!cart.length" class="flex h-full items-center">
+      <div v-if="!totalPrice || orderId" class="flex h-full items-center">
         <InfoBlock
+          v-if="!totalPrice && !orderId"
           title="Корзина пустая"
           description="Добавить хотя бы одну пару кроссовок, чтобы сделать заказ."
           imageUrl="/package-icon.png"
+        />
+
+        <InfoBlock
+          v-if="orderId"
+          title="Заказ оформлен!"
+          :description="`Ваш заказ ноиер #${orderId} скоро будет передан курьерской доставке.`"
+          imageUrl="/order-success-icon.png"
         />
       </div>
 

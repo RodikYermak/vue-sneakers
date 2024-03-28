@@ -8,6 +8,7 @@ import Drawer from './components/Drawer.vue'
 const cart = ref([])
 
 const drawerOpen = ref(false)
+const orderId = ref(null)
 
 const totalPrice = computed(() => {
   return cart.value.reduce((acc, item) => acc + item.price, 0)
@@ -38,6 +39,8 @@ const createOrder = async () => {
     }
 
     const { data } = await axios.post('https://d348e7c385bb7fd6.mokky.dev/orders', obj)
+
+    orderId.value = data.id
 
     cart.value = []
 
@@ -77,7 +80,8 @@ provide('cart', {
   onClickAddCart,
   totalPrice,
   vatPrice,
-  createOrder
+  createOrder,
+  orderId
 })
 </script>
 
@@ -94,5 +98,3 @@ provide('cart', {
 </template>
 
 <style scoped></style>
-
-<!-- 6:45:53 -->
