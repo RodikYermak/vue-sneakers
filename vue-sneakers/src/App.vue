@@ -1,12 +1,10 @@
 <script setup>
-import { onMounted, ref, watch, reactive, provide, computed } from 'vue'
+import { ref, watch, provide, computed } from 'vue'
 import axios from 'axios'
 
 import Header from './components/Header.vue'
-import CardList from './components/CardList.vue'
 import Drawer from './components/Drawer.vue'
 
-const items = ref([])
 const cart = ref([])
 
 const drawerOpen = ref(false)
@@ -26,11 +24,6 @@ const closeDrawer = () => {
 const openDrawer = () => {
   drawerOpen.value = true
 }
-
-const filters = reactive({
-  sortBy: 'title',
-  searchQuery: ''
-})
 
 const addToCart = (item) => {
   cart.value.push(item)
@@ -59,113 +52,6 @@ const removeFromCart = (item) => {
   item.isAdded = false
 }
 
-const onClickAddCart = (item) => {
-  if (!item.isAdded) {
-    addToCart(item)
-  } else {
-    removeFromCart(item)
-  }
-}
-
-const onChange = (event) => {
-  filters.sortBy = event.target.value
-}
-
-const onChangeSearch = (event) => {
-  filters.searchQuery = event.target.value
-}
-
-const fetchFavorites = async () => {
-  try {
-    const { data: favorites } = await axios.get('https://d348e7c385bb7fd6.mokky.dev/favorites')
-
-    items.value = items.value.map((item) => {
-      const favorite = favorites.find((favorite) => favorite.parentId === item.id)
-
-      if (!favorite) {
-        return item
-      }
-
-      return {
-        ...item,
-        isFavorite: true,
-        favoriteId: favorite.id
-      }
-    })
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-const addToFavorite = async (item) => {
-  try {
-    if (!item.isFavorite) {
-      const obj = {
-        parentId: item.id
-      }
-
-      item.isFavorite = true
-
-      const { data } = await axios.post('https://d348e7c385bb7fd6.mokky.dev/favorites', obj)
-
-      item.favoriteId = data.id
-    } else {
-      item.isFavorite = false
-      await axios.delete(`https://d348e7c385bb7fd6.mokky.dev/favorites/${item.favoriteId}`)
-
-      item.favoriteId = null
-    }
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-const fetchItems = async () => {
-  try {
-    const params = {
-      sortBy: filters.sortBy
-    }
-
-    if (filters.searchQuery) {
-      params.title = `*${filters.searchQuery}*`
-    }
-
-    const { data } = await axios.get('https://d348e7c385bb7fd6.mokky.dev/items', { params })
-
-    items.value = data.map((obj) => ({
-      ...obj,
-      isFavorite: false,
-      favoriteId: null,
-      isAdded: false
-    }))
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-onMounted(async () => {
-  const localCart = localStorage.getItem('cart')
-
-  cart.value = localCart ? JSON.parse(localCart) : []
-
-  await fetchItems()
-  await fetchFavorites()
-
-  items.value = items.value.map((item) => ({
-    ...item,
-    isAdded: cart.value.some((cartItem) => cartItem.id === item.id)
-  }))
-})
-
-watch(filters, fetchItems)
-
-watch(cart, () => {
-  items.value = items.value.map((item) => ({
-    ...item,
-    isAdded: false
-  }))
-})
-
 watch(
   cart,
   () => {
@@ -173,6 +59,14 @@ watch(
   },
   { deep: true }
 )
+
+const onClickAddCart = (item) => {
+  if (!item.isAdded) {
+    addToCart(item)
+  } else {
+    removeFromCart(item)
+  }
+}
 
 provide('cart', {
   cart,
@@ -194,30 +88,7 @@ provide('cart', {
     <Header :total-price="totalPrice" @open-drawer="openDrawer" />
 
     <div class="p-10">
-      <div class="flex justify-between items-center">
-        <h2 class="text-3xl font-bold mb-8">Все кроссовки</h2>
-
-        <div class="flex gap-4">
-          <select @change="onChange" class="py-2 px-3 border rounded-md outline-none">
-            <option value="title">По названию</option>
-            <option value="price">По цене (дешевые)</option>
-            <option value="-price">По цене (дорогие)</option>
-          </select>
-
-          <div class="relative">
-            <img src="/search.svg" class="absolute left-4 top-3" />
-            <input
-              @input="onChangeSearch"
-              type="text"
-              placeholder="Поиск..."
-              class="border border-slate-100 rounded-md py-2 pl-11 pr-4 outline-none focus:border-gray-400"
-            />
-          </div>
-        </div>
-      </div>
-      <div class="mt-10">
-        <CardList :items="items" @add-to-favorite="addToFavorite" @add-to-cart="onClickAddCart" />
-      </div>
+      <router-view></router-view>
     </div>
   </div>
 </template>
